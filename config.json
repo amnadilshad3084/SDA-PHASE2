@@ -1,0 +1,18 @@
+{
+  "data_source": {
+    "type": "json",
+    "filepath": "data/gdp_with_continent_filled.json"
+  },
+  "output": {
+    "type": "graphics",
+    "save_charts": true,
+    "output_dir": "output"
+  },
+  "analysis": {
+    "continent": "Asia",
+    "year": 2020,
+    "start_year": 2015,
+    "end_year": 2020,
+    "decline_years": 3
+  }
+}
