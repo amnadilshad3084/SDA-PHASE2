@@ -12,7 +12,12 @@ class TransformationEngine:
     core engine for gdp data processing
     handles filtering and analysis
     """
+<<<<<<< HEAD
    
+=======
+    # ==============================
+
+>>>>>>> ece9908bdbbee4fb378a4adc14d1df327d8f85f7
     def __init__(self, sink: DataSink, config: dict):
         """
         initialize engine
