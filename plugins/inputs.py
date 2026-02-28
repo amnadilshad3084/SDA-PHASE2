@@ -19,8 +19,12 @@ class JSONReader:
         
         try:
             #read json file
+            import re
             with open(self.filepath, 'r') as f:
-                data = json.load(f)
+                content = f.read()
+            content = re.sub(r':\s*NaN\b', ': null', content)
+            content = re.sub(r':\s*#[^,\n\}]*', ': null', content)
+            data = json.loads(content)
             
             print(f"loaded {len(data)} countries from json")
             
