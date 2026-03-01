@@ -1,9 +1,8 @@
 """
-contracts module defines protocols interfaces
+contracts module defines protocols interfaces (like a rule book)
 """
 from typing import Protocol, List, Dict, Any
 from typing_extensions import runtime_checkable
-
 
 @runtime_checkable
 class DataSink(Protocol):
