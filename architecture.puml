@@ -1,0 +1,160 @@
+@startuml GDP_Analysis_System
+
+title GDP Analysis System — Phase 2 Architecture\n(Dependency Inversion Principle)
+
+skinparam packageStyle rectangle
+skinparam classBackgroundColor #F8F9FA
+skinparam classBorderColor #495057
+skinparam arrowColor #343A40
+skinparam titleFontSize 16
+
+' ─── MAIN ───────────────────────────────────────────
+package "main.py (Orchestrator)" #D4EDDA {
+    class Main {
+        + load_config() : dict
+        + create_input_reader(config) : DataReader
+        + create_output_writer(config) : DataSink
+        + bootstrap() : void
+        + main() : void
+    }
+    class FactoryRegistry {
+        + INPUT_DRIVERS : dict
+        + OUTPUT_DRIVERS : dict
+    }
+}
+
+' ─── CORE ───────────────────────────────────────────
+package "core/ (Domain — owns contracts)" #CCE5FF {
+    interface DataSink <<Protocol>> {
+        + write(data: List[Dict], title: str) : void
+    }
+    interface PipelineService <<Protocol>> {
+        + execute(raw_data: List[Dict]) : void
+    }
+    interface DataReader <<Protocol>> {
+        + read() : List[Dict]
+    }
+    class TransformationEngine {
+        - sink : DataSink
+        - config : dict
+        - data : DataFrame
+        + __init__(sink, config)
+        + filter_by_region(data, region) : DataFrame
+        + filter_by_year(data, year) : DataFrame
+        + filter_by_date_range(data, start, end) : DataFrame
+        + get_top_10_countries(data) : List[Dict]
+        + get_bottom_10_countries(data) : List[Dict]
+        + get_gdp_growth_rate(data) : List[Dict]
+        + get_average_gdp_by_continent(data) : List[Dict]
+        + get_global_gdp_trend(data) : List[Dict]
+        + get_fastest_growing_continent(data) : List[Dict]
+        + get_declining_countries(data, years) : List[Dict]
+        + get_continent_contributions(data) : List[Dict]
+        + execute(raw_data) : void
+    }
+}
+
+' ─── PLUGINS / INPUTS ───────────────────────────────
+package "plugins/inputs.py (Source)" #FFF3CD {
+    class JSONReader {
+        - filepath : str
+        + __init__(filepath)
+        + read() : List[Dict]
+    }
+    class CSVReader {
+        - filepath : str
+        + __init__(filepath)
+        + read() : List[Dict]
+    }
+    class ExcelReader {
+        - filepath : str
+        + __init__(filepath)
+        + read() : List[Dict]
+    }
+}
+
+' ─── PLUGINS / OUTPUTS ──────────────────────────────
+package "plugins/outputs.py (Sink)" #F8D7DA {
+    class ConsoleWriter {
+        + write(data, title) : void
+    }
+    class GraphicsChartWriter {
+        - output_dir : str
+        + __init__(output_dir)
+        + write(data, title) : void
+        - _bar_chart(...) : void
+        - _horizontal_bar(...) : void
+        - _line_chart(...) : void
+        - _pie_chart(...) : void
+        - _declining_chart(...) : void
+    }
+    class FileWriter {
+        - output_dir : str
+        + write(data, title) : void
+    }
+}
+
+' ─── CONFIG ─────────────────────────────────────────
+package "config.json" #E2D9F3 {
+    class Config {
+        + data_source : dict
+        + output : dict
+        + analysis : dict
+    }
+}
+
+' ─── RELATIONSHIPS ──────────────────────────────────
+
+' Main reads config
+Main --> Config : reads
+
+' Main uses factory to create components
+Main --> FactoryRegistry : uses
+FactoryRegistry ..> JSONReader   : creates
+FactoryRegistry ..> CSVReader    : creates
+FactoryRegistry ..> ExcelReader  : creates
+FactoryRegistry ..> ConsoleWriter      : creates
+FactoryRegistry ..> GraphicsChartWriter : creates
+FactoryRegistry ..> FileWriter         : creates
+
+' Main injects sink into engine (DIP)
+Main --> TransformationEngine : injects DataSink\n+ creates
+
+' Engine depends only on protocol not concrete class
+TransformationEngine --> DataSink       : calls write()\n(never imports concrete class)
+TransformationEngine ..|> PipelineService : implements
+
+' Input readers implement DataReader protocol
+JSONReader   ..|> DataReader : implements
+CSVReader    ..|> DataReader : implements
+ExcelReader  ..|> DataReader : implements
+
+' Input readers call engine via PipelineService protocol
+JSONReader   --> PipelineService : calls execute()
+CSVReader    --> PipelineService : calls execute()
+ExcelReader  --> PipelineService : calls execute()
+
+' Output writers implement DataSink protocol
+ConsoleWriter       ..|> DataSink : implements
+GraphicsChartWriter ..|> DataSink : implements
+FileWriter          ..|> DataSink : implements
+
+' Core OWNS contracts (central authority)
+DataSink        --[hidden]-- TransformationEngine
+PipelineService --[hidden]-- TransformationEngine
+
+note bottom of TransformationEngine
+  Core is the AUTHORITY.
+  It defines DataSink and PipelineService.
+  It NEVER imports JSONReader, CSVReader,
+  ConsoleWriter, or GraphicsChartWriter.
+  Plugins depend on Core. Core depends on nothing.
+end note
+
+note top of Main
+  Orchestrator only.
+  Reads config.json, wires components,
+  never contains business logic.
+end note
+
+@enduml
