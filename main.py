@@ -3,7 +3,7 @@ main module connects all components together
 """
 import json
 from plugins.inputs import JSONReader, CSVReader, ExcelReader
-from plugins.outputs import ConsoleWriter
+from plugins.outputs import ConsoleWriter, GraphicsChartWriter
 from core.engine import TransformationEngine
 
 
@@ -61,8 +61,8 @@ def create_output_writer(config: dict):
     if output_type == 'console':
         return ConsoleWriter()
     elif output_type == 'graphics':
-        print("graphics writer not yet implemented using console for now")
-        return ConsoleWriter()
+        output_dir = config.get('output', {}).get('output_dir', 'output')
+        return GraphicsChartWriter(output_dir)
     else:
         print(f"unknown output type {output_type} using console")
         return ConsoleWriter()
