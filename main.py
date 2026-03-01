@@ -8,7 +8,7 @@ from plugins.outputs import ConsoleWriter, GraphicsChartWriter, FileWriter
 from core.engine     import TransformationEngine
 
 
-#            Factory maps 
+#  Factory maps 
 INPUT_DRIVERS = {
     "json":  JSONReader,
     "csv":   CSVReader,

@@ -4,13 +4,10 @@ output module - writes results to console or charts
 from typing import List, Dict, Any
 import matplotlib.pyplot as plt
 import matplotlib
-matplotlib.use('Agg')   # saves files without needing a display window
+matplotlib.use('Agg')   # saves files without display window
 import os
 
 
-# ─────────────────────────────────────────────
-#  CONSOLE WRITER
-# ─────────────────────────────────────────────
 class ConsoleWriter:
     """prints results to terminal"""
 
@@ -28,9 +25,9 @@ class ConsoleWriter:
         print("="*60)
 
 
-# ─────────────────────────────────────────────
+
 #  GRAPHICS CHART WRITER  (all 8 charts)
-# ─────────────────────────────────────────────
+
 class GraphicsChartWriter:
     """creates and saves all required charts to output/ folder"""
 
@@ -39,7 +36,7 @@ class GraphicsChartWriter:
         os.makedirs(output_dir, exist_ok=True)
         print(f"graphics chart writer initialized → saving to '{output_dir}/'")
 
-    # ── entry point called by engine ───────────────────────────────────────
+    #  entry point called by engine 
     def write(self, data: List[Dict[str, Any]], title: str = "") -> None:
         if not data:
             print("no data received for charts")
