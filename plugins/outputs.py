@@ -231,9 +231,9 @@ class GraphicsChartWriter:
         print(f"  saved → {filename}")
 
 
-# ─────────────────────────────────────────────
-#  FILE WRITER (optional bonus)
-# ─────────────────────────────────────────────
+
+#  FILE WRITER(optional )
+
 class FileWriter:
     """saves results as text file"""
 
